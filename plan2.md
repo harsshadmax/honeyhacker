@@ -1,4 +1,4 @@
-# plan2.md: Four novelty upgrades for Living Hacker Trap (PS-CYB-03)
+# plan2.md: Four novelty upgrades for Tarpit Ghost (PS-CYB-03)
 
 Status of the base project (already built and tested): web decoy, SSH decoy with a canned fake shell, FastAPI api
 with explainable risk scoring, session-bound canary token, SOC-style dashboard, text-only block rules,

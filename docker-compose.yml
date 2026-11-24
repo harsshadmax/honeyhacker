@@ -1,4 +1,4 @@
-name: hacker-trap
+name: tarpit-ghost
 
 # Hardening applied to every service (see README "Safety"): read-only root fs, no capabilities,
 # no-new-privileges, resource limits, no host mounts on decoys, ports bound to 127.0.0.1 only.

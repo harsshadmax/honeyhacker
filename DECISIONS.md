@@ -1,4 +1,4 @@
-# Decisions
+# Decisions (Tarpit Ghost)
 
 - Project lives in `C:\Users\Harsshad\.claude\hacker-trap` (the session's working folder); it can be moved anywhere.
 - Own minimal asyncssh fake shell instead of Cowrie: fewer moving parts, full control, faster for a 2-hour build.

@@ -1,4 +1,4 @@
-"""Run the whole Hacker Trap WITHOUT Docker (api + web decoy + ssh decoy as local Python processes).
+"""Run the whole Tarpit Ghost WITHOUT Docker (api + web decoy + ssh decoy as local Python processes).
 
     python run_local.py            # first run creates .local/venv and installs dependencies
     python run_local.py --reset    # wipe the local database first
@@ -105,7 +105,7 @@ def main():
             sys.exit("web decoy did not start")
         time.sleep(1.0)
 
-        print("\n=== Hacker Trap is running (local mode, no Docker) ===")
+        print("\n=== Tarpit Ghost is running (local mode, no Docker) ===")
         print("  Defender dashboard : http://127.0.0.1:8000")
         print("  Decoy web portal   : http://127.0.0.1:8081")
         print("  Decoy SSH          : ssh admin@127.0.0.1 -p 2222   (any password; accepts the 2nd try)")

@@ -1,6 +1,6 @@
-# Hacker Trap: a living deception system
+# Tarpit Ghost: a living deception system
 
-Hacker Trap lures attackers into believable fake services, keeps them sealed in hardened containers, records every
+Tarpit Ghost lures attackers into believable fake services, keeps them sealed in hardened containers, records every
 move, scores the risk with reasons you can read, and alerts the defender live. A bait file carries a **canary
 token** that fires even when the thief opens it on a different device. One click produces a firewall block rule,
 a Sigma detection rule or an ATT&CK Navigator layer from what the attacker actually did.
@@ -28,7 +28,7 @@ flowchart LR
 5. **Alert.** Opening the link, even from another device, turns the session CRITICAL and is flagged off-network.
 6. **Respond.** The defender watches live, cuts the session, and exports a block rule, a Sigma rule or an ATT&CK layer.
 
-![Defender console showing live alerts, sessions and the attacker profile](docs/dashboard.jpg)
+![Tarpit Ghost console: off-network canary alert, live feed, sessions and attacker profile](docs/dashboard.jpg)
 
 ---
 
