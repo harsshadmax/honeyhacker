@@ -1,0 +1,544 @@
+{
+  "generated": "2026-11-24 18:51:20",
+  "environment": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "python": "3.12.10",
+    "commit": "cbe0013",
+    "api": "http://127.0.0.1:8000",
+    "web": "http://127.0.0.1:8081",
+    "ssh_port": 2222
+  },
+  "actions": [
+    {
+      "name": "web_recon_scan",
+      "description": "30-path wordlist scan (gobuster-style)",
+      "expected_min_level": "MEDIUM",
+      "runs": 5,
+      "detected": 5,
+      "levels": [
+        "MEDIUM"
+      ],
+      "median_time_to_expected_s": 0.249,
+      "p95_time_to_expected_s": 0.307,
+      "behaviour_classes": [
+        "automated-scanner"
+      ],
+      "median_techniques": 1,
+      "rows": [
+        {
+          "final_level": "MEDIUM",
+          "score": 30,
+          "events": 30,
+          "detected": true,
+          "t_first_medium_s": 0.2620662999979686,
+          "t_expected_level_s": 0.2620662999979686,
+          "action_duration_s": 0.18,
+          "behaviour": "automated-scanner",
+          "techniques": 1
+        },
+        {
+          "final_level": "MEDIUM",
+          "score": 30,
+          "events": 30,
+          "detected": true,
+          "t_first_medium_s": 0.17799190000005183,
+          "t_expected_level_s": 0.17799190000005183,
+          "action_duration_s": 0.14,
+          "behaviour": "automated-scanner",
+          "techniques": 1
+        },
+        {
+          "final_level": "MEDIUM",
+          "score": 30,
+          "events": 30,
+          "detected": true,
+          "t_first_medium_s": 0.3070967000021483,
+          "t_expected_level_s": 0.3070967000021483,
+          "action_duration_s": 0.27,
+          "behaviour": "automated-scanner",
+          "techniques": 1
+        },
+        {
+          "final_level": "MEDIUM",
+          "score": 30,
+          "events": 30,
+          "detected": true,
+          "t_first_medium_s": 0.2494726000004448,
+          "t_expected_level_s": 0.2494726000004448,
+          "action_duration_s": 0.21,
+          "behaviour": "automated-scanner",
+          "techniques": 1
+        },
+        {
+          "final_level": "MEDIUM",
+          "score": 30,
+          "events": 30,
+          "detected": true,
+          "t_first_medium_s": 0.19860070000140695,
+          "t_expected_level_s": 0.19860070000140695,
+          "action_duration_s": 0.17,
+          "behaviour": "automated-scanner",
+          "techniques": 1
+        }
+      ]
+    },
+    {
+      "name": "web_bruteforce",
+      "description": "12 password guesses (hydra-style)",
+      "expected_min_level": "HIGH",
+      "runs": 5,
+      "detected": 5,
+      "levels": [
+        "CRITICAL"
+      ],
+      "median_time_to_expected_s": 0.178,
+      "p95_time_to_expected_s": 0.221,
+      "behaviour_classes": [
+        "automated-scanner"
+      ],
+      "median_techniques": 4,
+      "rows": [
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 33,
+          "detected": true,
+          "t_first_medium_s": 0.18236780000006547,
+          "t_expected_level_s": 0.1823681999994733,
+          "action_duration_s": 0.09,
+          "behaviour": "automated-scanner",
+          "techniques": 4
+        },
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 33,
+          "detected": true,
+          "t_first_medium_s": 0.22057689999928698,
+          "t_expected_level_s": 0.22057730000233278,
+          "action_duration_s": 0.1,
+          "behaviour": "automated-scanner",
+          "techniques": 4
+        },
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 33,
+          "detected": true,
+          "t_first_medium_s": 0.17293879999851924,
+          "t_expected_level_s": 0.17293960000097286,
+          "action_duration_s": 0.11,
+          "behaviour": "automated-scanner",
+          "techniques": 4
+        },
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 33,
+          "detected": true,
+          "t_first_medium_s": 0.17824110000219662,
+          "t_expected_level_s": 0.17824150000160444,
+          "action_duration_s": 0.11,
+          "behaviour": "automated-scanner",
+          "techniques": 4
+        },
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 33,
+          "detected": true,
+          "t_first_medium_s": 0.17646120000063092,
+          "t_expected_level_s": 0.17646160000003874,
+          "action_duration_s": 0.11,
+          "behaviour": "automated-scanner",
+          "techniques": 4
+        }
+      ]
+    },
+    {
+      "name": "web_sensitive_files",
+      "description": "GET /.env and /backup.sql",
+      "expected_min_level": "MEDIUM",
+      "runs": 5,
+      "detected": 5,
+      "levels": [
+        "MEDIUM"
+      ],
+      "median_time_to_expected_s": 0.05,
+      "p95_time_to_expected_s": 0.085,
+      "behaviour_classes": [
+        "automated-scanner"
+      ],
+      "median_techniques": 2,
+      "rows": [
+        {
+          "final_level": "MEDIUM",
+          "score": 22,
+          "events": 4,
+          "detected": true,
+          "t_first_medium_s": 0.05018150000250898,
+          "t_expected_level_s": 0.05018150000250898,
+          "action_duration_s": 0.02,
+          "behaviour": "automated-scanner",
+          "techniques": 2
+        },
+        {
+          "final_level": "MEDIUM",
+          "score": 22,
+          "events": 4,
+          "detected": true,
+          "t_first_medium_s": 0.030286500001238892,
+          "t_expected_level_s": 0.030286500001238892,
+          "action_duration_s": 0.01,
+          "behaviour": "automated-scanner",
+          "techniques": 2
+        },
+        {
+          "final_level": "MEDIUM",
+          "score": 22,
+          "events": 4,
+          "detected": true,
+          "t_first_medium_s": 0.08549469999707071,
+          "t_expected_level_s": 0.08549469999707071,
+          "action_duration_s": 0.02,
+          "behaviour": "automated-scanner",
+          "techniques": 2
+        },
+        {
+          "final_level": "MEDIUM",
+          "score": 22,
+          "events": 4,
+          "detected": true,
+          "t_first_medium_s": 0.06609319999915897,
+          "t_expected_level_s": 0.06609319999915897,
+          "action_duration_s": 0.03,
+          "behaviour": "automated-scanner",
+          "techniques": 2
+        },
+        {
+          "final_level": "MEDIUM",
+          "score": 22,
+          "events": 4,
+          "detected": true,
+          "t_first_medium_s": 0.028308799999649636,
+          "t_expected_level_s": 0.028308799999649636,
+          "action_duration_s": 0.01,
+          "behaviour": "automated-scanner",
+          "techniques": 2
+        }
+      ]
+    },
+    {
+      "name": "web_full_chain",
+      "description": "login, bait download, follow canary link",
+      "expected_min_level": "CRITICAL",
+      "runs": 5,
+      "detected": 5,
+      "levels": [
+        "CRITICAL"
+      ],
+      "median_time_to_expected_s": 0.561,
+      "p95_time_to_expected_s": 0.587,
+      "behaviour_classes": [
+        "automated-scanner"
+      ],
+      "median_techniques": 5,
+      "rows": [
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 7,
+          "detected": true,
+          "t_first_medium_s": 0.5801061999991362,
+          "t_expected_level_s": 0.5801069999979518,
+          "action_duration_s": 0.55,
+          "behaviour": "automated-scanner",
+          "techniques": 5
+        },
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 7,
+          "detected": true,
+          "t_first_medium_s": 0.5613406999982544,
+          "t_expected_level_s": 0.5613413999999466,
+          "action_duration_s": 0.53,
+          "behaviour": "automated-scanner",
+          "techniques": 5
+        },
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 7,
+          "detected": true,
+          "t_first_medium_s": 0.5865671999999904,
+          "t_expected_level_s": 0.5865679000016826,
+          "action_duration_s": 0.56,
+          "behaviour": "automated-scanner",
+          "techniques": 5
+        },
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 7,
+          "detected": true,
+          "t_first_medium_s": 0.5472539000002143,
+          "t_expected_level_s": 0.54725469999903,
+          "action_duration_s": 0.52,
+          "behaviour": "automated-scanner",
+          "techniques": 5
+        },
+        {
+          "final_level": "CRITICAL",
+          "score": 100,
+          "events": 7,
+          "detected": true,
+          "t_first_medium_s": 0.5339619000005769,
+          "t_expected_level_s": 0.5339626999993925,
+          "action_duration_s": 0.52,
+          "behaviour": "automated-scanner",
+          "techniques": 5
+        }
+      ]
+    },
+    {
+      "name": "web_low_and_slow",
+      "description": "2 sensitive probes 3 s apart, browser user agent",
+      "expected_min_level": "MEDIUM",
+      "runs": 2,
+      "detected": 2,
+      "levels": [
+        "MEDIUM"
+      ],
+      "median_time_to_expected_s": 3.048,
+      "p95_time_to_expected_s": 3.056,
+      "behaviour_classes": [
+        "unknown"
+      ],
+      "median_techniques": 2.0,
+      "rows": [
+        {
+          "final_level": "MEDIUM",
+          "score": 22,
+          "events": 4,
+          "detected": true,
+          "t_first_medium_s": 3.0400037999970664,
+          "t_expected_level_s": 3.0400037999970664,
+          "action_duration_s": 3.03,
+          "behaviour": "unknown",
+          "techniques": 2
+        },
+        {
+          "final_level": "MEDIUM",
+          "score": 22,
+          "events": 4,
+          "detected": true,
+          "t_first_medium_s": 3.056099399997038,
+          "t_expected_level_s": 3.056099399997038,
+          "action_duration_s": 3.03,
+          "behaviour": "unknown",
+          "techniques": 2
+        }
+      ]
+    },
+    {
+      "name": "benign_browse",
+      "description": "ordinary page load (false-positive check)",
+      "expected_min_level": "stay LOW",
+      "runs": 5,
+      "detected": 5,
+      "levels": [
+        "LOW"
+      ],
+      "median_time_to_expected_s": null,
+      "p95_time_to_expected_s": null,
+      "behaviour_classes": [
+        "unknown"
+      ],
+      "median_techniques": 1,
+      "rows": [
+        {
+          "final_level": "LOW",
+          "score": 3,
+          "events": 3,
+          "detected": true,
+          "t_first_medium_s": null,
+          "t_expected_level_s": null,
+          "action_duration_s": 0.02,
+          "behaviour": "unknown",
+          "techniques": 1
+        },
+        {
+          "final_level": "LOW",
+          "score": 3,
+          "events": 3,
+          "detected": true,
+          "t_first_medium_s": null,
+          "t_expected_level_s": null,
+          "action_duration_s": 0.02,
+          "behaviour": "unknown",
+          "techniques": 1
+        },
+        {
+          "final_level": "LOW",
+          "score": 3,
+          "events": 3,
+          "detected": true,
+          "t_first_medium_s": null,
+          "t_expected_level_s": null,
+          "action_duration_s": 0.01,
+          "behaviour": "unknown",
+          "techniques": 1
+        },
+        {
+          "final_level": "LOW",
+          "score": 3,
+          "events": 3,
+          "detected": true,
+          "t_first_medium_s": null,
+          "t_expected_level_s": null,
+          "action_duration_s": 0.07,
+          "behaviour": "unknown",
+          "techniques": 1
+        },
+        {
+          "final_level": "LOW",
+          "score": 3,
+          "events": 3,
+          "detected": true,
+          "t_first_medium_s": null,
+          "t_expected_level_s": null,
+          "action_duration_s": 0.05,
+          "behaviour": "unknown",
+          "techniques": 1
+        }
+      ]
+    },
+    {
+      "name": "ssh_session",
+      "description": "SSH login on 2nd try, 5 commands incl. wget/chmod, reads bait file",
+      "expected_min_level": "HIGH",
+      "runs": 3,
+      "detected": 3,
+      "levels": [
+        "HIGH"
+      ],
+      "median_time_to_expected_s": 0.9,
+      "p95_time_to_expected_s": 1.101,
+      "behaviour_classes": [
+        "scripted-tool"
+      ],
+      "median_techniques": 6,
+      "rows": [
+        {
+          "final_level": "HIGH",
+          "score": 86,
+          "events": 16,
+          "detected": true,
+          "t_first_medium_s": 0.4119200999994064,
+          "t_expected_level_s": 0.7130580000011832,
+          "action_duration_s": 1.31,
+          "behaviour": "scripted-tool",
+          "techniques": 6
+        },
+        {
+          "final_level": "HIGH",
+          "score": 86,
+          "events": 16,
+          "detected": true,
+          "t_first_medium_s": 0.37035240000113845,
+          "t_expected_level_s": 1.1014140000006591,
+          "action_duration_s": 1.65,
+          "behaviour": "scripted-tool",
+          "techniques": 6
+        },
+        {
+          "final_level": "HIGH",
+          "score": 86,
+          "events": 16,
+          "detected": true,
+          "t_first_medium_s": 0.3746260000007169,
+          "t_expected_level_s": 0.9003890999993018,
+          "action_duration_s": 1.65,
+          "behaviour": "scripted-tool",
+          "techniques": 6
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "adaptivity",
+      "status": "ok",
+      "sessions": 6,
+      "distinct_hostnames": 6,
+      "hostnames": [
+        "ci-int-08",
+        "app-prod-06",
+        "fs-stg-07",
+        "data-prod-07",
+        "db-int-06",
+        "ci-stg-02"
+      ],
+      "distinct_kernels": 1,
+      "verdict": "pass"
+    },
+    {
+      "name": "ssh_banner_vs_os",
+      "status": "ok",
+      "banner": "SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.9",
+      "verdict": "pass: OpenSSH 8.2p1 matches the claimed Ubuntu 20.04"
+    },
+    {
+      "name": "ssh_host_key_algorithms",
+      "status": "ok",
+      "offered": {
+        "ssh-ed25519": true,
+        "ecdsa-sha2-nistp256": true,
+        "rsa-sha2-512": true
+      },
+      "verdict": "pass: host key algorithms resemble stock OpenSSH"
+    },
+    {
+      "name": "http_error_pages",
+      "status": "ok",
+      "server_header": "Apache/2.4.41 (Ubuntu)",
+      "status_404": 404,
+      "status_405": 405,
+      "tells": [],
+      "verdict": "pass"
+    },
+    {
+      "name": "http_response_timing_ms",
+      "status": "ok",
+      "samples": 30,
+      "median": 3.54,
+      "p95": 26.7,
+      "stdev": 9.11,
+      "verdict": "informational (a lab loopback measurement; says nothing about WAN behaviour)"
+    },
+    {
+      "name": "ssh_command_timing_ms",
+      "status": "ok",
+      "samples": 15,
+      "min": 148.4,
+      "max": 370.2,
+      "stdev": 59.7,
+      "verdict": "pass: response times vary like a real host"
+    }
+  ],
+  "external": [
+    {
+      "tool": "nmap",
+      "status": "skipped (not installed)"
+    },
+    {
+      "tool": "ssh-audit",
+      "status": "skipped (not installed)"
+    },
+    {
+      "tool": "nikto",
+      "status": "skipped (not installed)"
+    }
+  ]
+}

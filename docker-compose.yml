@@ -25,8 +25,11 @@ services:
     environment:
       TRAP_KEY: "trap-demo-key"   # demo shared secret between decoys and api
       TRUST_XFF: "1"              # demo only: lets the attacker script simulate a source IP
+      PUBLIC_PORT: "8090"         # beacon-only listener (/c/* and /p/*.png); point a tunnel at THIS port, never 8000
+      PUBLIC_TRUST_CF: "${PUBLIC_TRUST_CF:-0}"   # set 1 when behind Cloudflare so CF-Connecting-IP is trusted
     ports:
       - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8090:8090"
     volumes:
       - trapdata:/data
     networks: [trapnet, decoynet]
@@ -43,7 +46,7 @@ services:
       API_URL: "http://api:8000"
       TRAP_KEY: "trap-demo-key"
       TRUST_XFF: "1"
-      CANARY_BASE: "http://127.0.0.1:8000"
+      CANARY_BASE: "${CANARY_BASE:-http://127.0.0.1:8000}"   # set to your tunnel URL for the off-network demo
     networks: [decoynet]
     depends_on:
       api: {condition: service_healthy}
@@ -54,7 +57,7 @@ services:
     environment:
       API_URL: "http://api:8000"
       TRAP_KEY: "trap-demo-key"
-      CANARY_BASE: "http://127.0.0.1:8000"
+      CANARY_BASE: "${CANARY_BASE:-http://127.0.0.1:8000}"   # set to your tunnel URL for the off-network demo
     networks: [decoynet]
     depends_on:
       api: {condition: service_healthy}

@@ -2,6 +2,11 @@
 import posixpath
 import shlex
 
+try:  # the sentinel lives with the world model; static mode never needs it
+    from worldgen import DENIED
+except ImportError:  # pragma: no cover
+    DENIED = object()
+
 HOST = "web-prod-03"
 
 DIRS = {
@@ -43,25 +48,39 @@ BAIT_PATH = "/home/admin/" + BAIT_NAME
 
 
 class FakeFS:
-    def __init__(self, user: str, on_bait=None):
-        self.user = user or "admin"
-        self.cwd = "/home/admin"
+    def __init__(self, user: str, on_bait=None, world=None):
+        self.world = world  # optional per-session WorldState (decoy_ssh/worldgen.py); None = the original static box
+        self.user = world.user if world else (user or "admin")
+        self.host = world.host if world else HOST
+        self.home = world.home if world else "/home/admin"
+        self.cwd = self.home
         self.on_bait = on_bait  # callable -> bait text with a fresh canary URL
 
     # --- helpers -----------------------------------------------------------
     def prompt(self) -> str:
-        shown = "~" if self.cwd == "/home/admin" else self.cwd
-        return f"{self.user}@{HOST}:{shown}$ "
+        shown = "~" if self.cwd == self.home else self.cwd
+        return f"{self.user}@{self.host}:{shown}$ "
 
     def _abs(self, p: str) -> str:
         if p.startswith("~"):
-            p = "/home/admin" + p[1:]
+            p = self.home + p[1:]
         if not p.startswith("/"):
             p = posixpath.join(self.cwd, p)
         return posixpath.normpath(p)
 
-    def _is_dir(self, p): return p in DIRS
-    def _is_file(self, p): return p in FILES or p == BAIT_PATH
+    def _is_dir(self, p): return self.world.is_dir(p) if self.world else p in DIRS
+    def _is_file(self, p): return self.world.is_file(p) if self.world else (p in FILES or p == BAIT_PATH)
+
+    def _names(self, d):
+        return self.world.dirs[d] if self.world else DIRS[d]
+
+    def _read(self, p):
+        """Text of a file, or None (missing) / worldgen.DENIED. Static mode keeps the original behaviour exactly."""
+        if self.world:
+            return self.world.read(p)
+        if p == BAIT_PATH:
+            return self.on_bait() if self.on_bait else "# fake credentials\n"
+        return FILES.get(p)
 
     # --- commands ----------------------------------------------------------
     def run(self, line: str):
@@ -98,30 +117,57 @@ class FakeFS:
         if name == "id":
             return f"uid=1000({self.user}) gid=1000({self.user}) groups=1000({self.user}),27(sudo)\n", False
         if name == "hostname":
-            return HOST + "\n", False
+            return self.host + "\n", False
         if name == "uname":
             if any("a" in f for f in flags):
+                if self.world:
+                    return self.world.uname_a(), False
                 return f"Linux {HOST} 5.4.0-169-generic #187-Ubuntu SMP Thu Nov 23 14:52:28 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux\n", False
             return "Linux\n", False
         if name == "uptime":
+            if self.world:
+                return self.world.uptime(), False
             return " 02:14:09 up 41 days,  3:02,  1 user,  load average: 0.08, 0.04, 0.01\n", False
         if name == "w":
             return f" 02:14:09 up 41 days\nUSER TTY FROM LOGIN@ WHAT\n{self.user} pts/0 - 02:11 -bash\n", False
         if name in ("ifconfig", "ip"):
+            if self.world:
+                return self.world.ifconfig(), False
             return ("eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n"
                     "        inet 10.0.4.21  netmask 255.255.255.0  broadcast 10.0.4.255\n"
                     "        ether 02:42:0a:00:04:15  txqueuelen 0  (Ethernet)\n"), False
         if name == "ps":
+            if self.world:
+                return self.world.ps(), False
             return ("  PID TTY          TIME CMD\n  912 ?        00:00:01 sshd\n 1033 ?        00:01:12 apache2\n"
                     " 1190 ?        00:03:40 mysqld\n 2210 pts/0    00:00:00 bash\n 2244 pts/0    00:00:00 ps\n"), False
         if name == "env":
+            if self.world:
+                return self.world.env(self.cwd), False
             return f"USER={self.user}\nHOME=/home/admin\nSHELL=/bin/bash\nPWD={self.cwd}\n", False
         if name == "echo":
             return " ".join(args) + "\n", False
         if name == "history":
+            if self.world:
+                return self.world.history(), False
             return "".join(f"  {i+1}  {l}\n" for i, l in enumerate(FILES["/home/admin/.bash_history"].splitlines())), False
+        # commands only the world-model box answers (the static box keeps saying "command not found")
+        if self.world:
+            if name == "df":
+                return self.world.df(), False
+            if name == "free":
+                return self.world.free(), False
+            if name == "last":
+                return self.world.last(), False
+            if name == "date":
+                import time as _t
+                return _t.strftime("%a %b %e %H:%M:%S UTC %Y\n"), False
+            if name == "crontab" and "-l" in flags:
+                return self.world.read("/etc/crontab") or "", False
+            if name == "lsb_release":
+                return "Distributor ID:\tUbuntu\nDescription:\tUbuntu 20.04.6 LTS\nRelease:\t20.04\nCodename:\tfocal\n", False
         if name == "cd":
-            target = self._abs(pos[0]) if pos else "/home/admin"
+            target = self._abs(pos[0]) if pos else self.home
             if self._is_dir(target):
                 self.cwd = target
                 return "", False
@@ -134,7 +180,7 @@ class FakeFS:
                 return posixpath.basename(target) + "\n", False
             if not self._is_dir(target):
                 return f"ls: cannot access '{pos[0] if pos else target}': No such file or directory\n", False
-            names = sorted(DIRS[target])
+            names = sorted(self._names(target))
             if any("a" in f for f in flags) or any("A" in f for f in flags):
                 pass
             else:
@@ -143,28 +189,35 @@ class FakeFS:
                 lines = [f"total {len(names) * 4}"]
                 for n in names:
                     full = posixpath.join(target, n)
-                    d = "d" if full in DIRS else "-"
+                    d = "d" if self._is_dir(full) else "-"
                     perm = "rwxr-xr-x" if d == "d" else "rw-r--r--"
-                    size = 4096 if d == "d" else len(FILES.get(full, "x" * 412))
-                    lines.append(f"{d}{perm} 1 {self.user} {self.user} {size:>6} Nov 22 02:03 {n}")
+                    if self.world:
+                        size, when = self.world.stat(full)
+                    else:
+                        size, when = (4096 if d == "d" else len(FILES.get(full, "x" * 412))), "Nov 22 02:03"
+                    lines.append(f"{d}{perm} 1 {self.user} {self.user} {size:>6} {when} {n}")
                 return "\n".join(lines) + "\n", False
             return "  ".join(names) + ("\n" if names else ""), False
-        if name == "cat":
+        if name in ("cat", "head", "tail", "less", "more") and (name == "cat" or self.world):
             if not pos:
                 return "", False
             out = ""
             for p in pos:
                 t = self._abs(p)
-                if t == BAIT_PATH:
-                    out += (self.on_bait() if self.on_bait else "# fake credentials\n")
-                elif t in FILES:
-                    out += FILES[t]
-                elif t in DIRS:
-                    out += f"cat: {p}: Is a directory\n"
-                elif t == "/etc/shadow":
-                    out += f"cat: {p}: Permission denied\n"
+                if self._is_dir(t):
+                    out += f"{name}: {p}: Is a directory\n"
+                    continue
+                text = self._read(t)
+                if text is None:
+                    out += (f"{name}: {p}: Permission denied\n" if t == "/etc/shadow" else f"{name}: {p}: No such file or directory\n")
+                elif text is DENIED:
+                    out += f"{name}: {p}: Permission denied\n"
                 else:
-                    out += f"cat: {p}: No such file or directory\n"
+                    if name == "head":
+                        text = "".join(text.splitlines(True)[:10])
+                    elif name == "tail":
+                        text = "".join(text.splitlines(True)[-10:])
+                    out += text
             return out, False
         if name in ("wget", "curl"):
             url = pos[-1] if pos else ""

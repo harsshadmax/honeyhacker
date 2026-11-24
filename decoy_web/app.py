@@ -4,6 +4,8 @@ import json
 import os
 import secrets
 import threading
+import time
+import urllib.parse
 import urllib.request
 
 from flask import Flask, Response, make_response, redirect, render_template, request
@@ -17,6 +19,7 @@ app = Flask(__name__)
 WEAK = {"admin", "password", "123456", "admin123", "letmein", "welcome1", "qwerty", "P@ssw0rd"}
 fails: dict[str, int] = {}
 authed: set[str] = set()
+_blocked_cache: dict[str, tuple[float, bool]] = {}
 
 
 def src_ip() -> str:
@@ -34,6 +37,8 @@ def sid_for() -> str:
 
 
 def _post(path: str, payload: dict):
+    payload = dict(payload, client_ts=time.time())
+
     def go():
         try:
             req = urllib.request.Request(
@@ -45,6 +50,21 @@ def _post(path: str, payload: dict):
     threading.Thread(target=go, daemon=True).start()
 
 
+def is_blocked(sid: str) -> bool:
+    """Ask the api whether this session was revoked. Cached for 1s so a flood cannot DDoS the api."""
+    hit = _blocked_cache.get(sid)
+    if hit and time.time() - hit[0] < 0.5:
+        return hit[1]
+    blocked = False
+    try:
+        r = urllib.request.urlopen(API + "/blocked/" + urllib.parse.quote(sid), timeout=0.6)
+        blocked = bool(json.loads(r.read()).get("blocked"))
+    except Exception:
+        blocked = False
+    _blocked_cache[sid] = (time.time(), blocked)
+    return blocked
+
+
 def log(kind: str, **detail):
     _post("/events", {"session_id": sid_for(), "src_ip": src_ip(), "service": "web",
                       "kind": kind, "detail": detail})
@@ -52,6 +72,12 @@ def log(kind: str, **detail):
 
 @app.before_request
 def log_request():
+    # A blocked session is refused before it can touch any route. Enforcement, not a badge.
+    if is_blocked(sid_for()):
+        log("blocked_hit", path=request.path, method=request.method)
+        return Response(
+            "<h1>403 Forbidden</h1><p>You do not have permission to access this resource.</p>"
+            "<hr><address>Apache/2.4.41 (Ubuntu) Server</address>", status=403, mimetype="text/html")
     # Every request is recorded (path, method, UA). Login and bait routes add their own events.
     log("request", method=request.method, path=request.path,
         ua=request.headers.get("User-Agent", "")[:200])
@@ -137,8 +163,37 @@ def fake_sql():
 
 @app.errorhandler(404)
 def nf(_e):
-    return Response("<h1>Not Found</h1><p>The requested URL was not found on this server.</p>"
-                    "<hr><address>Apache/2.4.41 (Ubuntu) Server</address>", status=404, mimetype="text/html")
+    r = Response("<h1>Not Found</h1><p>The requested URL was not found on this server.</p>"
+                 "<hr><address>Apache/2.4.41 (Ubuntu) Server</address>", status=404, mimetype="text/html")
+    r.status = "404 Not Found"
+    return r
+
+
+_SIG = "<hr><address>Apache/2.4.41 (Ubuntu) Server</address>"
+
+
+@app.errorhandler(405)
+def bad_method(e):
+    """Apache-style 405 (Flask's own page is a well-known framework tell)."""
+    r = Response("<h1>Method Not Allowed</h1><p>The requested method %s is not allowed for this URL.</p>%s"
+                 % ("".join(c for c in request.method if c.isalpha())[:16], _SIG), status=405, mimetype="text/html")
+    r.status = "405 Method Not Allowed"  # Apache's reason phrase, not Werkzeug's upper-case one
+    allow = e.get_response().headers.get("Allow")
+    if allow:
+        r.headers["Allow"] = allow
+    return r
+
+
+@app.errorhandler(400)
+def bad_request(_e):
+    return Response("<h1>Bad Request</h1><p>Your browser sent a request that this server could not understand.</p>" + _SIG,
+                    status=400, mimetype="text/html")
+
+
+@app.errorhandler(500)
+def server_error(_e):
+    return Response("<h1>Internal Server Error</h1><p>The server encountered an internal error or misconfiguration "
+                    "and was unable to complete your request.</p>" + _SIG, status=500, mimetype="text/html")
 
 
 if __name__ == "__main__":

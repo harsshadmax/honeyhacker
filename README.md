@@ -67,11 +67,30 @@ LOW < 20 ≤ MEDIUM < 50 ≤ HIGH < 90 ≤ CRITICAL. Each session shows its brea
 4. Click the session, press **Play replay**, then **Generate block rule**.
 5. Optional live touch: `ssh admin@127.0.0.1 -p 2222`, type any password twice, run `ls`, `cat passwords_backup.txt`.
 
+## Four additions (plan2.md)
+
+1. **World-model shell** (`decoy_ssh/worldgen.py`): every SSH session gets its own self-consistent fake machine (persona, hostname,
+   IP, users, processes, files). Same path always returns the same text; every generated secret file carries its own canary.
+   Optional local-LLM mode (`OLLAMA_URL`) is only for non-secret files and falls back to rules; it works under `run_local.py`
+   but not inside the isolated Docker network. Not wired or tested against a real model here.
+2. **Beacon off the box** (`/c/{token}`, `/p/{token}.png`): a second listener on `PUBLIC_PORT` (8090) serves only those two routes.
+   A hit from an IP that differs from the thief's session IP is flagged *off-network*. It needs a public URL (tunnel or reverse
+   proxy, set `CANARY_BASE`; `PUBLIC_TRUST_CF=1` behind Cloudflare). **No tunnel is started by this repo.** Opened through a VPN
+   or a mail scanner it will still fire, so treat "off-network" as strong evidence, not proof of a second human.
+3. **Evidence harness** (`eval/run_eval.py`, output `eval/RESULTS.md`): stand-in attack tools, time-to-detect, false-positive
+   check, fingerprint checks. Lab numbers on loopback only. `nmap`, `ssh-audit`, `nikto` are used if installed.
+4. **Behaviour class + exports**: rule-based `automated-scanner / scripted-tool / likely-human / unknown` with reasons
+   (heuristic, not ML), a Sigma rule and an ATT&CK Navigator layer per session (`/sessions/{id}/sigma`, `/navigator`).
+
 ## Tests
 
 ```powershell
 python tests/test_fakefs.py     # offline, no Docker needed
+python tests/test_worldmodel.py # offline
+python tests/test_export.py     # offline
 python tests/test_smoke.py      # needs the stack running (docker compose up)
+python tests/test_beacon.py     # needs the stack; set PUBLIC_TRUST_CF=1 on the api to exercise the off-network case
+python eval/run_eval.py         # needs the stack; writes eval/RESULTS.md
 ```
 
 ## Safety and known limits (be upfront about these)
