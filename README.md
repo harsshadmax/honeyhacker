@@ -1,7 +1,5 @@
 # Hacker Trap: a living deception system
 
-**PS-CYB-03 · Clash of Commits (IEEE RAS VIT)**
-
 Hacker Trap lures attackers into believable fake services, keeps them sealed in hardened containers, records every
 move, scores the risk with reasons you can read, and alerts the defender live. A bait file carries a **canary
 token** that fires even when the thief opens it on a different device. One click produces a firewall block rule,
@@ -10,10 +8,33 @@ a Sigma detection rule or an ATT&CK Navigator layer from what the attacker actua
 > **Defensive tool for your own machine.** Decoys never execute anything an attacker types, ports bind to
 > `127.0.0.1`, and block rules are generated as text only, never applied.
 
+## How it works
+
+```mermaid
+flowchart LR
+    A([1. Attacker finds a<br/>tempting fake service]) --> B["2. Decoy logs every move<br/>and runs nothing"]
+    B --> C["3. API scores risk<br/>with readable reasons"]
+    C --> D["4. Bait file carries<br/>a canary link"]
+    D --> E(["5. Link opened anywhere<br/>= CRITICAL alert"])
+    C --> F["Live dashboard"]
+    E --> F
+    F --> G(["6. Defender blocks, exports<br/>Sigma / ATT&CK"])
+```
+
+1. **Lure.** A fake admin portal and a fake Ubuntu SSH box invite attackers in. Nothing real is behind them.
+2. **Record.** Every request, login and command is logged. Commands are answered with generated text and never executed.
+3. **Score.** The API adds up risk signals and shows exactly which behaviour earned each point.
+4. **Tag.** Stolen bait files contain a unique canary link tied to that attacker's session.
+5. **Alert.** Opening the link, even from another device, turns the session CRITICAL and is flagged off-network.
+6. **Respond.** The defender watches live, cuts the session, and exports a block rule, a Sigma rule or an ATT&CK layer.
+
+![Defender console showing live alerts, sessions and the attacker profile](docs/dashboard.jpg)
+
 ---
 
 ## Contents
 
+0. [How it works](#how-it-works)
 1. [What it does](#what-it-does)
 2. [Quickstart](#quickstart)
 3. [Architecture](#architecture)
