@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Northwind Corp | Dashboard</title>
+<style>
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#f4f6f9;color:#223}
+header{background:#1d3557;color:#fff;padding:14px 28px;display:flex;justify-content:space-between}
+main{padding:28px;max-width:900px;margin:auto}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tile{background:#fff;border-radius:8px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.tile b{font-size:26px;display:block;color:#1d3557}h2{margin-top:30px}
+a.btn{display:inline-block;background:#e63946;color:#fff;padding:10px 16px;border-radius:5px;text-decoration:none;margin-top:8px}
+table{width:100%;background:#fff;border-collapse:collapse;border-radius:8px;overflow:hidden}
+td,th{padding:10px 14px;text-align:left;border-bottom:1px solid #eef}
+</style></head><body>
+<header><strong>Northwind Corp Admin</strong><span>admin &middot; Sign out</span></header>
+<main>
+<div class="grid"><div class="tile"><b>1,284</b>Active employees</div>
+<div class="tile"><b>37</b>Servers online</div><div class="tile"><b>2 days ago</b>Last backup</div></div>
+<h2>Backups</h2>
+<table><tr><th>File</th><th>Size</th><th>Date</th></tr>
+<tr><td>passwords_backup.txt</td><td>4 KB</td><td>2 days ago</td></tr>
+<tr><td><a href="/backup.sql">backup.sql</a></td><td>38 MB</td><td>2 days ago</td></tr></table>
+<a class="btn" href="/download/passwords_backup.txt">Download credentials backup</a>
+</main></body></html>

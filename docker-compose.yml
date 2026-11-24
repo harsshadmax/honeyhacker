@@ -1,0 +1,88 @@
+name: hacker-trap
+
+# Hardening applied to every service (see README "Safety"): read-only root fs, no capabilities,
+# no-new-privileges, resource limits, no host mounts on decoys, ports bound to 127.0.0.1 only.
+#
+# Network design (egress isolation):
+#   decoynet  = internal: true  -> decoys have NO route to the internet or the host.
+#   trapnet   = normal bridge   -> only the api and the two port gateways live here.
+# The decoys can talk to the api (which sits on both networks); attackers reach the decoys only
+# through tiny socat gateways that forward a single TCP port each.
+x-hardened: &hardened
+  read_only: true
+  tmpfs: ["/tmp"]
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  pids_limit: 128
+  mem_limit: 256m
+  cpus: 0.5
+  restart: unless-stopped
+
+services:
+  api:
+    <<: *hardened
+    build: ./api
+    environment:
+      TRAP_KEY: "trap-demo-key"   # demo shared secret between decoys and api
+      TRUST_XFF: "1"              # demo only: lets the attacker script simulate a source IP
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - trapdata:/data
+    networks: [trapnet, decoynet]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+  decoy_web:
+    <<: *hardened
+    build: ./decoy_web
+    environment:
+      API_URL: "http://api:8000"
+      TRAP_KEY: "trap-demo-key"
+      TRUST_XFF: "1"
+      CANARY_BASE: "http://127.0.0.1:8000"
+    networks: [decoynet]
+    depends_on:
+      api: {condition: service_healthy}
+
+  decoy_ssh:
+    <<: *hardened
+    build: ./decoy_ssh
+    environment:
+      API_URL: "http://api:8000"
+      TRAP_KEY: "trap-demo-key"
+      CANARY_BASE: "http://127.0.0.1:8000"
+    networks: [decoynet]
+    depends_on:
+      api: {condition: service_healthy}
+
+  gw_web:                           # 127.0.0.1:8081 -> decoy_web:8080
+    <<: *hardened
+    image: alpine/socat:1.8.0.0
+    user: "65534:65534"
+    command: ["TCP-LISTEN:8080,fork,reuseaddr", "TCP:decoy_web:8080"]
+    ports:
+      - "127.0.0.1:8081:8080"
+    networks: [trapnet, decoynet]
+    depends_on: [decoy_web]
+
+  gw_ssh:                           # 127.0.0.1:2222 -> decoy_ssh:2222
+    <<: *hardened
+    image: alpine/socat:1.8.0.0
+    user: "65534:65534"
+    command: ["TCP-LISTEN:2222,fork,reuseaddr", "TCP:decoy_ssh:2222"]
+    ports:
+      - "127.0.0.1:2222:2222"
+    networks: [trapnet, decoynet]
+    depends_on: [decoy_ssh]
+
+volumes:
+  trapdata:
+
+networks:
+  trapnet:
+  decoynet:
+    internal: true
